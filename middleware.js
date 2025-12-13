@@ -1,5 +1,3 @@
-// src/middleware.ts or middleware.ts
-
 import arcjet, { detectBot, shield } from "@arcjet/next";
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
@@ -23,20 +21,19 @@ const aj = arcjet({
 });
 
 export default clerkMiddleware(async (auth, req) => {
-  // ✅ Run Arcjet INSIDE Clerk middleware
-  const arcjetResponse = await aj.protect(req);
+  // Arcjet first
+  const decision = await aj.protect(req);
 
-  if (arcjetResponse.isDenied()) {
+  if (decision.isDenied()) {
     return NextResponse.json(
       { error: "Request blocked" },
       { status: 403 }
     );
   }
 
-  const { userId } = auth();
-
-  if (!userId && isProtectedRoute(req)) {
-    return auth().redirectToSignIn();
+  // Clerk auth
+  if (!auth.userId && isProtectedRoute(req)) {
+    return auth.redirectToSignIn();
   }
 
   return NextResponse.next();
