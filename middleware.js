@@ -1,12 +1,6 @@
 import arcjet, { detectBot, shield } from "@arcjet/next";
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { clerkMiddleware } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-
-const isProtectedRoute = createRouteMatcher([
-  "/dashboard(.*)",
-  "/account(.*)",
-  "/transaction(.*)",
-]);
 
 const aj = arcjet({
   key: process.env.ARCJET_KEY,
@@ -20,30 +14,37 @@ const aj = arcjet({
 });
 
 export default clerkMiddleware(async (auth, req) => {
-  // Arcjet first
-  const decision = await aj.protect(req);
+    const { pathname } = req.nextUrl;
 
-  if (decision.isDenied()) {
-    return NextResponse.json(
-      { error: "Request blocked" },
-      { status: 403 }
-    );
+    if (
+      pathname.startsWith("/sign-in") ||
+      pathname.startsWith("/sign-up") ||
+      pathname === "/"
+    ) {
+      return NextResponse.next();
+    }
+
+    const decision = await aj.protect(req);
+    if (decision.isDenied()) {
+      return NextResponse.json(
+        { error: "Request blocked" },
+        { status: 403 }
+      );
+    }
+    return NextResponse.next();
+  },
+  {
+    publicRoutes: [
+      "/",
+      "/sign-in(.*)",
+      "/sign-up(.*)",
+    ],
   }
-
-  // Clerk auth
-  if (!auth.userId && isProtectedRoute(req)) {
-    const signInUrl = new URL("/sign-in", req.url);
-    signInUrl.searchParams.set("redirect_url", req.url);
-
-    return NextResponse.redirect(signInUrl);
-  }
-
-  return NextResponse.next();
-});
+);
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico).*)",
+    "/((?!_next|.*\\..*).*)",
     "/(api|trpc)(.*)",
   ],
 };
