@@ -15,6 +15,7 @@ const aj = arcjet({
 
 export default clerkMiddleware(async (auth, req) => {
     const { pathname } = req.nextUrl;
+    const { userId } = auth();
 
     if (
       pathname.startsWith("/sign-in") ||
@@ -24,27 +25,17 @@ export default clerkMiddleware(async (auth, req) => {
       return NextResponse.next();
     }
 
-    const decision = await aj.protect(req);
-    if (decision.isDenied()) {
-      return NextResponse.json(
-        { error: "Request blocked" },
-        { status: 403 }
-      );
-    }
-    return NextResponse.next();
-  },
-  {
-    publicRoutes: [
-      "/",
-      "/sign-in(.*)",
-      "/sign-up(.*)",
-    ],
+    const decision = await aj.protect(req,{
+      userId: userId ?? "anonymous",
+    });
+  if (decision.isDenied()) {
+    return NextResponse.json({ error: "Request blocked" }, { status: 403 });
   }
-);
+  return NextResponse.next();
+});
 
 export const config = {
   matcher: [
     "/((?!_next|.*\\..*).*)",
-    "/(api|trpc)(.*)",
   ],
 };
