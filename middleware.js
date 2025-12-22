@@ -15,7 +15,7 @@ const aj = arcjet({
 
 export default clerkMiddleware(async (auth, req) => {
     const { pathname } = req.nextUrl;
-    const { userId } = auth();
+    const { userId } = await auth();
 
     if (
       pathname.startsWith("/sign-in") ||

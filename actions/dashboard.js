@@ -19,8 +19,10 @@ const serializeTransaction = (obj) => {
 
 export async function getUserAccounts() {
   const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
+  if (!userId){ 
+    throw new Error("Unauthorized");
+    //TODO: throw new Response("Unauthorized", { status: 401, redirect: "/" });
+  }
   const user = await db.user.findUnique({
     where: { clerkUserId: userId },
   });
