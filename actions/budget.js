@@ -4,7 +4,7 @@ import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 
-export async function getCurrentBudget(accountId) {
+export async function getCurrentBudget() {
   try {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
@@ -44,7 +44,6 @@ export async function getCurrentBudget(accountId) {
           gte: startOfMonth,
           lte: endOfMonth,
         },
-        accountId,
       },
       _sum: {
         amount: true,

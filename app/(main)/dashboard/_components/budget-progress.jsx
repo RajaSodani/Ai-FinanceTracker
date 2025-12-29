@@ -68,7 +68,7 @@ export function BudgetProgress({ initialBudget, currentExpenses }) {
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex-1">
           <CardTitle className="text-sm font-medium">
-            Monthly Budget (Default Account)
+            Monthly Budget
           </CardTitle>
           <div className="flex items-center gap-2 mt-1">
             {isEditing ? (
@@ -103,9 +103,9 @@ export function BudgetProgress({ initialBudget, currentExpenses }) {
               <>
                 <CardDescription>
                   {initialBudget
-                    ? `$${currentExpenses.toFixed(
+                    ? `₹${currentExpenses.toFixed(
                         2
-                      )} of $${initialBudget.amount.toFixed(2)} spent`
+                      )} of ₹${initialBudget.amount.toFixed(2)} spent`
                     : "No budget set"}
                 </CardDescription>
                 <Button
@@ -132,10 +132,11 @@ export function BudgetProgress({ initialBudget, currentExpenses }) {
                   ? "bg-red-500"
                   : percentUsed >= 75
                     ? "bg-yellow-500"
-                    : "bg-green-500"
+                    : "bg-green-600"
               }`}
             />
             <p className="text-xs text-muted-foreground text-right">
+              {percentUsed > 100 ? "❌ " : percentUsed >= 90 ? "🔥 " : percentUsed >= 75 ? "🟡 " : "🟢 "}
               {percentUsed.toFixed(1)}% used
             </p>
           </div>

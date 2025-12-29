@@ -15,12 +15,10 @@ export default async function DashboardPage() {
     getDashboardData(),
   ]);
 
-  const defaultAccount = accounts?.find((account) => account.isDefault);
-
-  // Get budget for default account
+  // Get overall budget
   let budgetData = null;
-  if (defaultAccount) {
-    budgetData = await getCurrentBudget(defaultAccount.id);
+  if (accounts) {
+    budgetData = await getCurrentBudget();
   }
 
   return (
